@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <title>3D Book</title>
+</head>
+
+<body>
+  <div class="book">
+    <div class="card" id="card" onclick="openBook()">
+      <div class="cover">
+        <img src="cover.jpg" alt="">
+        <img src="back.jpg" alt="">
+      </div>
+
+      <div class="page active">
+        <img src="pic.jpg" alt="">
+        <p class="typing" data-text="The smile that makes every ordinary day look like a favorite page."></p>
+      </div>
+
+      <div class="page">
+        <img src="pic2.jpg" alt="">
+        <p class="typing" data-text="Of course you’re in the book section. Even the shelves probably wanted to read you twice."></p>
+      </div>
+
+      <div class="page">
+        <img src="pic3.jpg" alt="">
+        <p class="typing" data-text="I was supposed to admire the photo, not the person this much."></p>
+      </div>
+
+      <div class="page">
+        <img src="pic4.jpg" alt="">
+        <p class="typing" data-text="The author never warned me someone this pretty would show up"></p>
+      </div>
+
+      <div class="page">
+        <img src="pic5.jpg" alt="">
+        <p class="typing" data-text="Final page: still you. Obviously."></p>
+      </div>
+
+      <div class="page-buttons">
+        <button class="arrow-btn left" onclick="prevPage(event)">&#10094;</button>
+        <button class="arrow-btn right" onclick="nextPage(event)">&#10095;</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const card = document.getElementById("card");
+    const pages = document.querySelectorAll(".page");
+
+    let currentPage = 0;
+    let opened = false;
+    let animating = false;
+    let typingInterval;
+
+    function openBook() {
+      if (!opened) {
+        card.classList.add("open");
+        opened = true;
+
+        setTimeout(() => {
+          typeText();
+        }, 700);
+      }
+    }
+
+    function typeText() {
+      clearInterval(typingInterval);
+
+      const textBox = pages[currentPage].querySelector(".typing");
+      const text = textBox.getAttribute("data-text");
+
+      textBox.innerHTML = "";
+
+      let i = 0;
+
+      typingInterval = setInterval(() => {
+        textBox.innerHTML = text.substring(0, i) + '<span class="cursor">|</span>';
+        i++;
+
+        if (i > text.length) {
+          clearInterval(typingInterval);
+          textBox.innerHTML = text;
+        }
+      }, 45);
+    }
+
+    function nextPage(e) {
+      e.stopPropagation();
+
+      if (!opened || animating || currentPage >= pages.length - 1) return;
+
+      clearInterval(typingInterval);
+      animating = true;
+
+      const current = pages[currentPage];
+      const next = pages[currentPage + 1];
+
+      next.classList.add("active");
+      next.style.zIndex = "4";
+
+      current.style.zIndex = "8";
+      current.classList.add("turn-next");
+
+      setTimeout(() => {
+        current.classList.remove("active", "turn-next");
+        current.style.zIndex = "";
+        next.style.zIndex = "";
+
+        currentPage++;
+        animating = false;
+        typeText();
+      }, 850);
+    }
+
+    function prevPage(e) {
+      e.stopPropagation();
+
+      if (!opened || animating || currentPage <= 0) return;
+
+      clearInterval(typingInterval);
+      animating = true;
+
+      const current = pages[currentPage];
+      const prev = pages[currentPage - 1];
+
+      current.classList.remove("active");
+
+      prev.classList.add("active", "turn-prev");
+      prev.style.zIndex = "8";
+
+      setTimeout(() => {
+        prev.classList.remove("turn-prev");
+        prev.style.zIndex = "";
+
+        currentPage--;
+        animating = false;
+        typeText();
+      }, 850);
+    }
+  </script>
+</body>
+</html>
